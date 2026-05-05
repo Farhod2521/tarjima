@@ -1,0 +1,42 @@
+services:
+  backend:
+    build:
+      context: ./backend_standart_ai
+      dockerfile: Dockerfile
+    container_name: standart_tahlil_backend
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    env_file:
+      - ./backend_standart_ai/.env
+    volumes:
+      - backend_uploads:/tmp/standart_tahlil
+      - backend_data:/data
+    networks:
+      - standart_net
+
+  frontend:
+    build:
+      context: ./frontend_standart_ai
+      dockerfile: Dockerfile
+      args:
+        # Brauzer ochgan hostga qarab API tanlanadi:
+        # localhost:3000 -> localhost:8000
+        # 192.168.20.113:3000 -> 192.168.20.113:8000
+        NEXT_PUBLIC_API_URL: auto
+    container_name: standart_tahlil_frontend
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+    networks:
+      - standart_net
+
+volumes:
+  backend_uploads:
+  backend_data:
+
+networks:
+  standart_net:
+    driver: bridge
